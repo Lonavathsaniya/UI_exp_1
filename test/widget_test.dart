@@ -1,30 +1,37 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:my_app/main.dart';
+import 'package:exp_3/main.dart';  // <-- CHANGE THIS
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  group("Experiment 3: Responsive UI Testing", () {
+    
+    testWidgets("App loads and Scaffold is present", (tester) async {
+      await tester.pumpWidget(Experiment3());
+      expect(find.byType(Scaffold), findsOneWidget);
+    });
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    testWidgets("Displays Mobile View text for small screens", (tester) async {
+      await tester.binding.setSurfaceSize(const Size(400, 800)); // Simulate mobile screen
+      await tester.pumpWidget(Experiment3());
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
+      expect(find.textContaining("Mobile View"), findsOneWidget);
+    });
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    testWidgets("Displays Tablet View text for larger screens", (tester) async {
+      await tester.binding.setSurfaceSize(const Size(900, 1200)); // Simulate tablet screen
+      await tester.pumpWidget(Experiment3());
+
+      expect(find.textContaining("Tablet View"), findsOneWidget);
+    });
+
+    testWidgets("MediaQuery value affects UI", (tester) async {
+      const width = 500.0;
+      await tester.binding.setSurfaceSize(const Size(width, 800));
+      await tester.pumpWidget(Experiment3());
+
+      // Should show mobile since width < 600
+      expect(find.textContaining("Mobile View"), findsOneWidget);
+    });
+
   });
 }
